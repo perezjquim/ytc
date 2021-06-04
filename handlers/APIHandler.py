@@ -24,7 +24,7 @@ class APIHandler( ):
 		has_error = False
 
 		print( '> Downloading and cutting' )
-		command = "ffmpeg $(youtube-dl -g '{}' | sed 's/^/-ss {} -i /') -t {} -c copy {}".format( args[ 'url' ], args[ 'start_time' ], args[ 'duration' ], video_tmp_filename )
+		command = "ffmpeg $(youtube-dl -g -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4' '{}' | sed 's/^/-ss {} -i /') -t {} -c copy {}".format( args[ 'url' ], args[ 'start_time' ], args[ 'duration' ], video_tmp_filename )
 		print( 'COMMAND: {}'.format( command ) )
 		process = Popen( command.split( ), stdout = PIPE, stderr = PIPE )
 		output, error = process.communicate( )
