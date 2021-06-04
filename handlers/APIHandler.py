@@ -17,12 +17,13 @@ class APIHandler( ):
 
 		current_datetime = datetime.now( )
 		current_datetime_str = current_datetime.isoformat( )
+		video_tmp_directory = '/app/tmp/'
 		video_tmp_filename = 'out.mp4'
 		video_output_filename = 'YTC - {}.mp4'.format( current_datetime_str )		
 
 		has_error = False
 
-		command = "ffmpeg $(youtube-dl -g '{}' | sed 's/^/-ss {} -i /') -t {} -c copy {}".format( args[ 'url' ], args[ 'start_time' ], video_tmp_filename, args[ 'duration' ] )
+		command = "ffmpeg $(youtube-dl -g '{}' | sed 's/^/-ss {} -i /') -t {} -c copy {}{}".format( args[ 'url' ], args[ 'start_time' ], video_tmp_directory, video_tmp_filename, args[ 'duration' ] )
 		process = Popen( command.split( ), stdout = PIPE, stderr = PIPE )
 		output, error = process.communicate( )
 
@@ -31,7 +32,7 @@ class APIHandler( ):
 		if has_error:
 			return Response( 'NOK', status = 500 )
 
-		succ_response = send_from_directory( "./", filename = video_tmp_filename, as_attachment = True  )
+		succ_response = send_from_directory( video_tmp_directory, filename = video_tmp_filename, as_attachment = True  )
 		succ_response[ 'Content-Disposition' ] = "attachment; filename={};".format( video_output_filename )
 
 		command = "rm {}".format( video_tmp_filename )
