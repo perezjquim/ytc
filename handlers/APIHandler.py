@@ -26,6 +26,8 @@ class APIHandler( ):
 		command = "ffmpeg $(youtube-dl -g '{}' | sed 's/^/-ss {} -i /') -t {} -c copy {}{}".format( args[ 'url' ], args[ 'start_time' ], video_tmp_directory, video_tmp_filename, args[ 'duration' ] )
 		process = Popen( command.split( ), stdout = PIPE, stderr = PIPE )
 		output, error = process.communicate( )
+		print( output )
+		print( error )
 
 		has_error = ( process.returncode == 0 )
 
@@ -38,6 +40,8 @@ class APIHandler( ):
 		command = "rm {}".format( video_tmp_filename )
 		process = Popen( command.split( ), stdout = PIPE, stderr = PIPE )
 		output, error = process.communicate( )
+		print( output )
+		print( error )
 
 		has_error = ( process.returncode == 0 )
 
