@@ -3,7 +3,6 @@ import json
 from subprocess import Popen, PIPE
 from datetime import datetime
 import youtube_dl #dummy
-import ffmpeg #dummy
 
 api = Blueprint( "APIHandler", __name__ )
 

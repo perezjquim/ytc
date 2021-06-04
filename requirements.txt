@@ -1,5 +1,4 @@
 Flask_Cors==3.0.10
+gunicorn==20.0.4
 Flask==0.12.2
 youtube_dl==2021.5.16
-gunicorn==20.0.4
-ffmpeg==1.4
