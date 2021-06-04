@@ -17,7 +17,7 @@ class APIHandler( ):
 
 		current_datetime = datetime.now( )
 		current_datetime_str = current_datetime.isoformat( )
-		video_tmp_directory = '/app/tmp/'
+		video_tmp_directory = './'
 		video_tmp_filename = 'out.mp4'
 		video_output_filename = 'YTC - {}.mp4'.format( current_datetime_str )		
 
