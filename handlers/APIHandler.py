@@ -23,25 +23,34 @@ class APIHandler( ):
 
 		has_error = False
 
+		print( '> Downloading and cutting' )
 		command = "ffmpeg $(youtube-dl -g '{}' | sed 's/^/-ss {} -i /') -t {} -c copy {}{}".format( args[ 'url' ], args[ 'start_time' ], video_tmp_directory, video_tmp_filename, args[ 'duration' ] )
+		print( 'COMMAND: {}', command )
 		process = Popen( command.split( ), stdout = PIPE, stderr = PIPE )
 		output, error = process.communicate( )
-		print( output )
-		print( error )
+		print( 'OUTPUT: {}'.format( output ) )
+		print( 'ERROR: {}'.format( error ) )
+		print( '< Downloading and cutting' )
 
 		has_error = ( process.returncode == 0 )
 
 		if has_error:
 			return Response( 'NOK', status = 500 )
 
+		print( '> preparing request' )	
 		succ_response = send_from_directory( video_tmp_directory, filename = video_tmp_filename, as_attachment = True  )
 		succ_response[ 'Content-Disposition' ] = "attachment; filename={};".format( video_output_filename )
+		print( '< preparing request' )			
 
+		print( '> cleaning up' )		
 		command = "rm {}".format( video_tmp_filename )
+		print( 'COMMAND: {}', command )		
 		process = Popen( command.split( ), stdout = PIPE, stderr = PIPE )
 		output, error = process.communicate( )
 		print( output )
-		print( error )
+		print( 'OUTPUT: {}'.format( output ) )
+		print( 'ERROR: {}'.format( error ) )
+		print( '< cleaning up' )		
 
 		has_error = ( process.returncode == 0 )
 
