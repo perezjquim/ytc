@@ -24,7 +24,7 @@ class APIHandler( ):
 		has_error = False
 
 		print( '> Downloading' )
-		dl_command = "youtube-dl -g --merge-output-format mp4 {}".format( args[ 'url' ] )
+		dl_command = "youtube-dl --youtube-skip-dash-manifest -g --merge-output-format mp4 {}".format( args[ 'url' ] )
 		print( 'COMMAND: {}'.format( dl_command ) )
 		dl_process = Popen( dl_command.split( ), stdout = PIPE, stderr = PIPE )
 		dl_output, dl_error = dl_process.communicate( )
@@ -37,7 +37,8 @@ class APIHandler( ):
 			return Response( 'NOK - Error while downloading!', status = 500 )		
 
 		print( '> Cutting' )
-		cut_command = "ffmpeg -i '{}' -t {} -c copy {}".format( dl_output, args[ 'start_time' ], args[ 'duration' ], video_tmp_filename )
+		dl_output = dl_output.decode( 'utf-8' )
+		cut_command = "ffmpeg -i '{}' -ss {} -t {} -c copy {}".format( dl_output, args[ 'start_time' ], args[ 'duration' ], video_tmp_filename )
 		print( 'COMMAND: {}'.format( cut_command ) )
 		cut_process = Popen( cut_command.split( ), stdout = PIPE, stderr = PIPE )
 		cut_output, cut_error = cut_process.communicate( )
