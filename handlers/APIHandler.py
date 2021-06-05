@@ -37,7 +37,7 @@ class APIHandler( ):
 			return Response( 'NOK - Error while downloading!', status = 500 )		
 
 		print( '> Cutting' )
-		dl_output = dl_output.decode( 'utf-8' )
+		dl_output = dl_output.decode( 'utf-8' ).rstrip( )
 		cut_command = "ffmpeg -i '{}' -ss {} -t {} -c copy {}".format( dl_output, args[ 'start_time' ], args[ 'duration' ], video_tmp_filename )
 		print( 'COMMAND: {}'.format( cut_command ) )
 		cut_process = Popen( cut_command.split( ), stdout = PIPE, stderr = PIPE )
