@@ -3,6 +3,7 @@ import json
 from subprocess import Popen, PIPE
 from datetime import datetime
 import youtube_dl #dummy
+from urllib.parse import unquote
 
 api = Blueprint( "APIHandler", __name__ )
 
@@ -24,7 +25,7 @@ class APIHandler( ):
 		has_error = False
 
 		print( '> Downloading' )
-		dl_command = " youtube-dl --force-ipv4 -g --merge-output-format mp4 {} ".format( args[ 'url' ] )
+		dl_command = " youtube-dl --force-ipv4 -g --merge-output-format mp4 {} ".format( unquote( args[ 'url' ] ) )
 		print( 'COMMAND: {}'.format( dl_command ) )
 		dl_process = Popen( dl_command.split( ), stdout = PIPE, stderr = PIPE )
 		dl_output, dl_error = dl_process.communicate( )
@@ -38,9 +39,9 @@ class APIHandler( ):
 
 		print( '> Cutting' )
 		yt_stream_urls = dl_output.decode( 'utf-8' ).split( '\n' )
-		yt_video_url = yt_stream_urls[ 0 ]
-		yt_audio_url = yt_stream_urls[ 1 ]		
-		cut_command = "ffmpeg -y -ss {} -i {} -ss {} -i {} -t {} -c copy {}".format( args[ 'start_time' ], yt_video_url, args[ 'start_time' ], yt_audio_url, args[ 'duration' ], video_tmp_filename )
+		yt_video_url = unquote( yt_stream_urls[ 0 ] )
+		yt_audio_url = unquote( yt_stream_urls[ 1 ] )
+		cut_command = "ffmpeg  -y -ss {} -i {} -ss {} -i {} -t {} -c copy -strict -2 {}".format( args[ 'start_time' ], yt_video_url, args[ 'start_time' ], yt_audio_url, args[ 'duration' ], video_tmp_filename )
 		print( 'COMMAND: {}'.format( cut_command ) )
 		cut_process = Popen( cut_command.split( ), stdout = PIPE, stderr = PIPE )
 		cut_output, cut_error = cut_process.communicate( )
@@ -50,26 +51,12 @@ class APIHandler( ):
 
 		#has_error = ( cut_process.returncode != 0 or cut_error )
 
-		if has_error:
-			return Response( 'NOK - Error while cutting!', status = 500 )
+		#if has_error:
+		#	return Response( 'NOK - Error while cutting!', status = 500 )
 
 		print( '> preparing request' )	
 		succ_response = send_from_directory( video_tmp_directory, filename = video_tmp_filename, as_attachment = True  )
-		#succ_response.headers[ 'Content-Disposition' ] = "attachment; filename={};".format( video_output_filename )
+		succ_response.headers[ 'Content-Disposition' ] = "attachment; filename={};".format( video_output_filename )
 		print( '< preparing request' )			
 
-		"""print( '> cleaning up' )		
-		cl_command = "rm {}".format( video_tmp_filename )
-		print( 'COMMAND: {}'.format( cl_command ) )
-		cl_process = Popen( cl_command.split( ), stdout = PIPE, stderr = PIPE )
-		cl_output, cl_error = cl_process.communicate( )
-		print( 'OUTPUT: {}'.format( cl_output ) )
-		print( 'ERROR: {}'.format( cl_error ) )
-		print( '< cleaning up' )	"""	
-
-		#has_error = ( cl_process.returncode != 0 or cl_error )
-
-		#if has_error:
-			#return Response( 'NOK - Error while cleaning up!', status = 500 )
-		#else:
 		return succ_response
