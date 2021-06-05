@@ -58,19 +58,18 @@ class APIHandler( ):
 		succ_response.headers[ 'Content-Disposition' ] = "attachment; filename={};".format( video_output_filename )
 		print( '< preparing request' )			
 
-		print( '> cleaning up' )		
+		"""print( '> cleaning up' )		
 		cl_command = "rm {}".format( video_tmp_filename )
 		print( 'COMMAND: {}'.format( cl_command ) )
 		cl_process = Popen( cl_command.split( ), stdout = PIPE, stderr = PIPE )
 		cl_output, cl_error = cl_process.communicate( )
-		print( cl_output )
 		print( 'OUTPUT: {}'.format( cl_output ) )
 		print( 'ERROR: {}'.format( cl_error ) )
-		print( '< cleaning up' )		
+		print( '< cleaning up' )	"""	
 
-		has_error = ( cl_process.returncode != 0 or cl_error )
+		#has_error = ( cl_process.returncode != 0 or cl_error )
 
-		if has_error:
-			return Response( 'NOK - Error while cleaning up!', status = 500 )
-		else:
-			return succ_response
+		#if has_error:
+			#return Response( 'NOK - Error while cleaning up!', status = 500 )
+		#else:
+		return succ_response
