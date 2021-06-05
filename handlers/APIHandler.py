@@ -23,19 +23,32 @@ class APIHandler( ):
 
 		has_error = False
 
-		print( '> Downloading and cutting' )
-		command = "ffmpeg $(youtube-dl --verbose -g -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4' '{}' | sed 's/^/-ss {} -i /') -t {} -c copy {}".format( args[ 'url' ], args[ 'start_time' ], args[ 'duration' ], video_tmp_filename )
-		print( 'COMMAND: {}'.format( command ) )
-		process = Popen( command.split( ), stdout = PIPE, stderr = PIPE )
-		output, error = process.communicate( )
-		print( 'OUTPUT: {}'.format( output ) )
-		print( 'ERROR: {}'.format( error ) )
-		print( '< Downloading and cutting' )
+		print( '> Downloading' )
+		dl_command = "youtube-dl --verbose -g -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4' '{}'".format( args[ 'url' ] )
+		print( 'COMMAND: {}'.format( dl_command ) )
+		dl_process = Popen( dl_command.split( ), stdout = PIPE, stderr = PIPE )
+		dl_output, dl_error = dl_process.communicate( )
+		print( 'OUTPUT: {}'.format( dl_output ) )
+		print( 'ERROR: {}'.format( dl_error ) )
+		print( '< Downloading' )
 
-		has_error = ( process.returncode == 0 or error )
+		has_error = ( dl_process.returncode != 0 or dl_error )
+		if has_error:
+			return Response( 'NOK - Error while downloading!', status = 500 )		
+
+		print( '> Cutting' )
+		cut_command = "ffmpeg -i '{}' -t {} -c copy {}".format( dl_output, args[ 'start_time' ], args[ 'duration' ], video_tmp_filename )
+		print( 'COMMAND: {}'.format( cut_command ) )
+		cut_process = Popen( cut_command.split( ), stdout = PIPE, stderr = PIPE )
+		cut_output, cut_error = cut_process.communicate( )
+		print( 'OUTPUT: {}'.format( cut_output ) )
+		print( 'ERROR: {}'.format( cut_error ) )
+		print( '< cutting' )		
+
+		has_error = ( cut_process.returncode != 0 or cut_error )
 
 		if has_error:
-			return Response( 'NOK', status = 500 )
+			return Response( 'NOK - Error while cutting!', status = 500 )
 
 		print( '> preparing request' )	
 		succ_response = send_from_directory( video_tmp_directory, filename = video_tmp_filename, as_attachment = True  )
@@ -43,18 +56,18 @@ class APIHandler( ):
 		print( '< preparing request' )			
 
 		print( '> cleaning up' )		
-		command = "rm {}".format( video_tmp_filename )
-		print( 'COMMAND: {}'.format( command ) )
-		process = Popen( command.split( ), stdout = PIPE, stderr = PIPE )
-		output, error = process.communicate( )
-		print( output )
-		print( 'OUTPUT: {}'.format( output ) )
-		print( 'ERROR: {}'.format( error ) )
+		cl_command = "rm {}".format( video_tmp_filename )
+		print( 'COMMAND: {}'.format( cl_command ) )
+		cl_process = Popen( cl_command.split( ), stdout = PIPE, stderr = PIPE )
+		cl_output, cl_error = cl_process.communicate( )
+		print( cl_output )
+		print( 'OUTPUT: {}'.format( cl_output ) )
+		print( 'ERROR: {}'.format( cl_error ) )
 		print( '< cleaning up' )		
 
-		has_error = ( process.returncode == 0 or error )
+		has_error = ( cl_process.returncode != 0 or cl_error )
 
 		if has_error:
-			return Response( 'NOK', status = 500 )
+			return Response( 'NOK - Error while cleaning up!', status = 500 )
 		else:
 			return succ_response
