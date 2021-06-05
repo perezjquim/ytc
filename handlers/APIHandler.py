@@ -55,7 +55,7 @@ class APIHandler( ):
 
 		print( '> preparing request' )	
 		succ_response = send_from_directory( video_tmp_directory, filename = video_tmp_filename, as_attachment = True  )
-		succ_response.headers[ 'Content-Disposition' ] = "attachment; filename={};".format( video_output_filename )
+		#succ_response.headers[ 'Content-Disposition' ] = "attachment; filename={};".format( video_output_filename )
 		print( '< preparing request' )			
 
 		"""print( '> cleaning up' )		
