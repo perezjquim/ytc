@@ -48,7 +48,7 @@ class APIHandler( ):
 		print( 'ERROR: {}'.format( cut_error ) )
 		print( '< cutting' )		
 
-		has_error = ( cut_process.returncode != 0 )
+		#has_error = ( cut_process.returncode != 0 or cut_error )
 
 		if has_error:
 			return Response( 'NOK - Error while cutting!', status = 500 )
