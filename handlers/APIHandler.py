@@ -24,7 +24,7 @@ class APIHandler( ):
 		has_error = False
 
 		print( '> Downloading' )
-		dl_command = "youtube-dl -g -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4' '{}'".format( args[ 'url' ] )
+		dl_command = "youtube-dl -g -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4' {}".format( args[ 'url' ] )
 		print( 'COMMAND: {}'.format( dl_command ) )
 		dl_process = Popen( dl_command.split( ), stdout = PIPE, stderr = PIPE )
 		dl_output, dl_error = dl_process.communicate( )
