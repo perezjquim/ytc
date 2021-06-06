@@ -1,9 +1,7 @@
 from flask import Blueprint, Response, request, send_from_directory
-import json
-from subprocess import Popen, PIPE
 from datetime import datetime
 import youtube_dl #dummy
-from urllib.parse import unquote
+from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 
 api = Blueprint( "APIHandler", __name__ )
 
@@ -22,37 +20,22 @@ class APIHandler( ):
 		video_tmp_filename = 'out.mp4'
 		video_output_filename = 'YTC - {}.mp4'.format( current_datetime_str )		
 
-		has_error = False
+		start_datetime = datetime.strptime( args[ 'start_time' ], "%M:%S" )
+		start_timedelta = start_datetime - datetime( 1900, 1, 1 )
+		start_time_in_seconds = start_timedelta.total_seconds( )
+
+		end_datetime = datetime.strptime( args[ 'end_time' ], "%M:%S" )
+		end_timedelta = end_datetime - datetime( 1900, 1, 1 )
+		end_time_in_seconds = end_timedelta.total_seconds( )		
 
 		print( '> Downloading' )
-		dl_command = " youtube-dl --force-ipv4 -g --merge-output-format mp4 {} ".format( unquote( args[ 'url' ] ) )
-		print( 'COMMAND: {}'.format( dl_command ) )
-		dl_process = Popen( dl_command.split( ), stdout = PIPE, stderr = PIPE )
-		dl_output, dl_error = dl_process.communicate( )
-		print( 'OUTPUT: {}'.format( dl_output ) )
-		print( 'ERROR: {}'.format( dl_error ) )
+		with youtube_dl.YoutubeDL( { "format": "18", "outtmpl": video_tmp_filename } ) as ydl:
+        		ydl.download( [ args[ 'url' ] ] )		
 		print( '< Downloading' )
 
-		has_error = ( dl_process.returncode != 0 or dl_error )
-		if has_error:
-			return Response( 'NOK - Error while downloading!', status = 500 )		
-
 		print( '> Cutting' )
-		yt_stream_urls = dl_output.decode( 'utf-8' ).split( '\n' )
-		yt_video_url = unquote( yt_stream_urls[ 0 ] )
-		yt_audio_url = unquote( yt_stream_urls[ 1 ] )
-		cut_command = "ffmpeg  -y -ss {} -i {} -ss {} -i {} -t {} -c copy -strict -2 {}".format( args[ 'start_time' ], yt_video_url, args[ 'start_time' ], yt_audio_url, args[ 'duration' ], video_tmp_filename )
-		print( 'COMMAND: {}'.format( cut_command ) )
-		cut_process = Popen( cut_command.split( ), stdout = PIPE, stderr = PIPE )
-		cut_output, cut_error = cut_process.communicate( )
-		print( 'OUTPUT: {}'.format( cut_output ) )
-		print( 'ERROR: {}'.format( cut_error ) )
+		ffmpeg_extract_subclip("ydl.mp4", start_time_in_seconds, end_time_in_seconds, targetname = video_tmp_filename )	
 		print( '< cutting' )		
-
-		#has_error = ( cut_process.returncode != 0 or cut_error )
-
-		#if has_error:
-		#	return Response( 'NOK - Error while cutting!', status = 500 )
 
 		print( '> preparing request' )	
 		succ_response = send_from_directory( video_tmp_directory, filename = video_tmp_filename, as_attachment = True  )
