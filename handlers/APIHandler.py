@@ -2,6 +2,7 @@ from flask import Blueprint, Response, request, send_from_directory
 from datetime import datetime
 import youtube_dl #dummy
 from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
+import os
 
 api = Blueprint( "APIHandler", __name__ )
 
@@ -37,11 +38,12 @@ class APIHandler( ):
 
 		print( '> Cutting' )
 		ffmpeg_extract_subclip( video_ydl_filename, start_time_in_seconds, end_time_in_seconds, targetname = video_ffmpeg_filename )	
-		print( '< cutting' )		
+		os.remove( video_ydl_filename )		
+		print( '< Cutting' )		
 
-		print( '> preparing request' )	
+		print( '> Preparing request' )	
 		succ_response = send_from_directory( video_tmp_directory, filename = video_ffmpeg_filename, as_attachment = True  )
 		succ_response.headers[ 'Content-Disposition' ] = "attachment; filename={};".format( video_output_filename )
-		print( '< preparing request' )			
+		print( '< Preparing request' )			
 
 		return succ_response
