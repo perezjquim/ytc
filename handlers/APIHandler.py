@@ -17,7 +17,9 @@ class APIHandler( ):
 		current_datetime = datetime.now( )
 		current_datetime_str = current_datetime.isoformat( )
 		video_tmp_directory = './'
-		video_tmp_filename = 'out.mp4'
+		video_ydl_filename = 'tmp-ydl.mp4'
+		video_ffmpeg_filename = 'tmp-ff.mp4'		
+
 		video_output_filename = 'YTC - {}.mp4'.format( current_datetime_str )		
 
 		start_datetime = datetime.strptime( args[ 'start_time' ], "%M:%S" )
@@ -29,16 +31,16 @@ class APIHandler( ):
 		end_time_in_seconds = end_timedelta.total_seconds( )		
 
 		print( '> Downloading' )
-		with youtube_dl.YoutubeDL( { "format": "18", "outtmpl": video_tmp_filename } ) as ydl:
+		with youtube_dl.YoutubeDL( { "format": "18", "outtmpl": video_ydl_filename } ) as ydl:
         		ydl.download( [ args[ 'url' ] ] )		
 		print( '< Downloading' )
 
 		print( '> Cutting' )
-		ffmpeg_extract_subclip("ydl.mp4", start_time_in_seconds, end_time_in_seconds, targetname = video_tmp_filename )	
+		ffmpeg_extract_subclip( video_ydl_filename, start_time_in_seconds, end_time_in_seconds, targetname = video_ffmpeg_filename )	
 		print( '< cutting' )		
 
 		print( '> preparing request' )	
-		succ_response = send_from_directory( video_tmp_directory, filename = video_tmp_filename, as_attachment = True  )
+		succ_response = send_from_directory( video_tmp_directory, filename = video_ffmpeg_filename, as_attachment = True  )
 		succ_response.headers[ 'Content-Disposition' ] = "attachment; filename={};".format( video_output_filename )
 		print( '< preparing request' )			
 
