@@ -40,7 +40,7 @@ class APIHandler( ):
 		clip = VideoFileClip( video_ydl_filename ).subclip( start_time_in_seconds, end_time_in_seconds )
 		clip.write_videofile( video_ffmpeg_filename, codec = "libx264", temp_audiofile = 'temp-audio.m4a', remove_temp = True, audio_codec = 'aac' )		
 		os.remove( video_ydl_filename )		
-		os.remote( 'tmp-ff.mp4' )
+		os.remove( 'tmp-ff.mp4' )
 		print( '< Cutting' )		
 
 		print( '> Preparing request' )	
