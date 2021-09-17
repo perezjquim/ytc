@@ -1,8 +1,8 @@
 from flask import Blueprint, Response, request, send_from_directory
 from datetime import datetime
 import youtube_dl #dummy
-from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 import os
+from moviepy.editor import VideoFileClip
 
 api = Blueprint( "APIHandler", __name__ )
 
@@ -37,7 +37,8 @@ class APIHandler( ):
 		print( '< Downloading' )
 
 		print( '> Cutting' )
-		ffmpeg_extract_subclip( video_ydl_filename, start_time_in_seconds, end_time_in_seconds, targetname = video_ffmpeg_filename )	
+		clip = VideoFileClip( video_ydl_filename ).subclip( start_time_in_seconds, end_time_in_seconds )
+		clip.write_videofile( video_ffmpeg_filename, codec = "libx264", temp_audiofile = 'temp-audio.m4a', remove_temp = True, audio_codec = 'aac' )		
 		os.remove( video_ydl_filename )		
 		print( '< Cutting' )		
 
