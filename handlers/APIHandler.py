@@ -38,9 +38,9 @@ class APIHandler( ):
 
 		print( '> Cutting' )
 		clip = VideoFileClip( video_ydl_filename ).subclip( start_time_in_seconds, end_time_in_seconds )
-		clip.write_videofile( video_ffmpeg_filename, codec = "libx264", temp_audiofile = 'temp-audio.m4a', remove_temp = True, audio_codec = 'aac' )		
-		os.remove( video_ydl_filename )		
-		os.remove( 'tmp-ff.mp4' )
+		clip.write_videofile( filename = video_ffmpeg_filename, codec = "libx264", temp_audiofile = 'temp-audio.m4a', remove_temp = True, audio_codec = 'aac' )		
+		clip.close( )
+		os.remove( video_ydl_filename )	
 		print( '< Cutting' )		
 
 		print( '> Preparing request' )	
