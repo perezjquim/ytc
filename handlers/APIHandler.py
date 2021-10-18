@@ -1,6 +1,6 @@
 from flask import Blueprint, Response, request, send_from_directory
 from datetime import datetime
-import youtube_dl #dummy
+import yt_dlp
 import os
 from moviepy.editor import VideoFileClip
 
@@ -32,8 +32,9 @@ class APIHandler( ):
 		end_time_in_seconds = end_timedelta.total_seconds( )		
 
 		print( '> Downloading' )
-		with youtube_dl.YoutubeDL( { "format": "18", "outtmpl": video_ydl_filename } ) as ydl:
-        		ydl.download( [ args[ 'url' ] ] )		
+		ydl_opts = { "format": "18", "outtmpl": video_ydl_filename }
+		with yt_dlp.YoutubeDL( ydl_opts ) as ydl:
+    			ydl.download( [ args[ 'uri' ] ] )			
 		print( '< Downloading' )
 
 		print( '> Cutting' )
