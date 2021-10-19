@@ -33,7 +33,7 @@ class APIHandler( ):
 		end_time_in_seconds = end_timedelta.total_seconds( )		
 
 		print( '> Downloading' )
-		yt = YouTube( args[ 'uri' ] )
+		yt = YouTube( args[ 'url' ] )
 		yt_stream = yt.streams.get_by_itag( 18 )
 		yt_stream.download( filename = video_ydl_filename )
 		print( '< Downloading' )
