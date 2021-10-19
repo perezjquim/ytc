@@ -1,6 +1,6 @@
 from flask import Blueprint, Response, request, send_from_directory
 from datetime import datetime
-import yt_dlp
+from pytube import YouTube
 import os
 from moviepy.editor import VideoFileClip
 
@@ -13,6 +13,7 @@ class APIHandler( ):
 
 	@api.route( '/crop-video', methods = [ 'GET' ] )
 	def crop_video( ):
+
 		args = request.args
 
 		current_datetime = datetime.now( )
@@ -32,9 +33,9 @@ class APIHandler( ):
 		end_time_in_seconds = end_timedelta.total_seconds( )		
 
 		print( '> Downloading' )
-		ydl_opts = { "format": "18", "outtmpl": video_ydl_filename }
-		with yt_dlp.YoutubeDL( ydl_opts ) as ydl:
-    			ydl.download( [ args[ 'uri' ] ] )			
+		yt = YouTube( args[ 'uri' ] )
+		yt_stream = yt.streams.get_by_itag( 18 )
+		yt_stream.download( filename = video_ydl_filename )
 		print( '< Downloading' )
 
 		print( '> Cutting' )
@@ -48,6 +49,9 @@ class APIHandler( ):
 		succ_response = send_from_directory( video_tmp_directory, filename = video_ffmpeg_filename, as_attachment = True  )
 		succ_response.headers[ 'Content-Disposition' ] = "attachment; filename={};".format( video_output_filename )
 		succ_response.headers[ 'Access-Control-Expose-Headers' ] = 'Content-Disposition'
-		print( '< Preparing request' )			
+		print( '< Preparing request' )		
+
+		print( '!! DONE !!' )	
 
 		return succ_response
+		
