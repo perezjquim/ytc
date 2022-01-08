@@ -3,6 +3,7 @@ from datetime import datetime
 from pytube import YouTube
 import os
 from moviepy.editor import VideoFileClip
+from fp.fp import FreeProxy
 
 api = Blueprint( "APIHandler", __name__ )
 
@@ -15,6 +16,14 @@ class APIHandler( ):
 	def crop_video( ):
 
 		args = request.args
+
+		print( '> Fetching proxy' )
+		proxy = FreeProxy( ).get( )
+		proxies = { 
+			'http': proxy
+		}
+		print( proxies )
+		print( '< Fetching proxy' )
 
 		current_datetime = datetime.now( )
 		current_datetime_str = current_datetime.isoformat( )
@@ -33,7 +42,7 @@ class APIHandler( ):
 		end_time_in_seconds = end_timedelta.total_seconds( )		
 
 		print( '> Downloading' )
-		yt = YouTube( args[ 'url' ] )
+		yt = YouTube( url = args[ 'url' ], proxies = proxies )
 		yt_stream = yt.streams.get_by_itag( 18 )
 		yt_stream.download( filename = video_ydl_filename )
 		print( '< Downloading' )
