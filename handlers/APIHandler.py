@@ -19,6 +19,9 @@ class APIHandler( ):
 
 		print( '> Fetching proxy' )
 		proxy = FreeProxy( ).get( )
+		if( proxy == '' or proxy == 'There are no working proxies at this time.' ):
+			proxy = FreeProxy( timeout = 1 ).get( )
+
 		proxies = { 
 			'http': proxy
 		}
