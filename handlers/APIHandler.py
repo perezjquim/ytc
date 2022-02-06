@@ -1,4 +1,4 @@
-from flask import Blueprint, Response, request, send_from_directory
+from flask import Blueprint, Response, request, send_from_directory, jsonify
 from datetime import datetime, timedelta
 from pytube import YouTube
 import os
@@ -7,6 +7,7 @@ from fp.fp import FreeProxy
 from urllib.parse import quote
 import os.path
 import threading
+
 
 api = Blueprint( "APIHandler", __name__ )
 
@@ -74,12 +75,12 @@ class APIHandler( ):
 
 		duration = str( timedelta( seconds = yt.length ) )
 
-		return {
+		return jsonify({
 			'title': yt.title,
 			'thumbnail_url': yt.thumbnail_url,
 			'author': yt.author,
 			'duration': duration
-		}
+		})
 
 	def _get_video( url ):
 		proxies = APIHandler._get_proxies( )
