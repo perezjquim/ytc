@@ -1,6 +1,6 @@
 from flask import Blueprint, Response, request, send_from_directory, jsonify
 from datetime import datetime, timedelta
-from pytube import YouTube
+from yt_dlp import YoutubeDL
 import os
 from moviepy.editor import VideoFileClip
 from fp.fp import FreeProxy
@@ -35,9 +35,9 @@ class APIHandler( ):
 		if os.path.exists( '{}/{}'.format( video_tmp_directory, video_ydl_filename ) ):
 			print( '< Downloading.. done (already downloaded)!' )
 		else:
-			yt = APIHandler._get_video( args[ 'url' ] )
-			yt_stream = yt.streams.get_by_itag( 18 )
-			yt_stream.download( filename = video_ydl_filename )
+			ydl_opts = { "format": "18", "outtmpl": video_ydl_filename }
+			with YoutubeDL( ydl_opts ) as ydl:
+    				ydl.download( [ args[ 'url' ] ] )			
 			print( '< Downloading.. done!' )			
 
 		video_output_filename = 'YTC - {}.mp4'.format( current_datetime_str )	
@@ -71,16 +71,19 @@ class APIHandler( ):
 	def get_video_info( ):
 		args = request.args
 
-		yt = APIHandler._get_video( args[ 'url' ] )
+		with YoutubeDL({}) as ydl:
+		      	video_info = ydl.extract_info( args[ 'url' ], download = False )
+		      	title = video_info.get( 'title' )
+		      	thumbnail_url = video_info.get( 'thumbnails' )[ 0 ][ 'url' ]
+		      	author = video_info.get( 'uploader' )
+		      	duration = str( timedelta( seconds = video_info.get( 'duration' ) ) )
 
-		duration = str( timedelta( seconds = yt.length ) )
-
-		return jsonify({
-			'title': yt.title,
-			'thumbnail_url': yt.thumbnail_url,
-			'author': yt.author,
-			'duration': duration
-		})
+		      	return jsonify({
+				'title': title,
+				'thumbnail_url': thumbnail_url,
+				'author': author,
+				'duration': duration
+			})
 
 	def _get_video( url ):
 		proxies = APIHandler._get_proxies( )
