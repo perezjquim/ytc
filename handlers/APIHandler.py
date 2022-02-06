@@ -6,11 +6,13 @@ from moviepy.editor import VideoFileClip
 from fp.fp import FreeProxy
 from urllib.parse import quote
 import os.path
+import threading
 
 api = Blueprint( "APIHandler", __name__ )
 
 class APIHandler( ):
 
+	__proxies_lock = None
 	__proxies = None
 
 	def get_blueprint( self ):
@@ -90,20 +92,40 @@ class APIHandler( ):
 
 	def _get_proxies( ):
 		print( '> Fetching proxies' )
+
+		if not APIHandler.__proxies_lock:
+			APIHandler.__proxies_lock = threading.Lock( )
+
 		if APIHandler.__proxies:
-			print( '< Fetching proxies.. done (found in cache)!')
+			print( '< Fetching proxies.. done (found in cache)!')			
 			return APIHandler.__proxies
 
-		proxy = FreeProxy( ).get( )
-		if( proxy == '' or proxy == 'There are no working proxies at this time.' ):
-			proxy = FreeProxy( timeout = 1 ).get( )
+		else:
+			with APIHandler.__proxies_lock:
 
-		proxies = { 
-			'http': proxy
-		}
-		print( proxies )
+				if APIHandler.__proxies:
+					print( '< Fetching proxies.. done (found in cache)!')					
+					return APIHandler.__proxies
 
-		APIHandler.__proxies = proxies
-		print( '< Fetching proxies.. done!' )
+				else:
+					proxy = FreeProxy( ).get( )
+					if( proxy == '' or proxy == 'There are no working proxies at this time.' ):
+						proxy = FreeProxy( timeout = 1 ).get( )
+
+					proxies = { 
+						'http': proxy
+					}
+					print( proxies )
+
+					APIHandler.__proxies = proxies					
+
+					print( '< Fetching proxies.. done!' )					
+
+					return proxies
+
+
+
+
+		
 
 		
