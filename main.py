@@ -6,6 +6,8 @@ from handlers.APIHandler import APIHandler
 api_handler = APIHandler( )
 
 app = Flask( __name__ )
+app.config[ 'JSONIFY_PRETTYPRINT_REGULAR' ] = False
+
 CORS( app )
 app.register_blueprint( api_handler.get_blueprint( ) )
 
