@@ -1,4 +1,4 @@
-Flask==0.12.2
+Flask==2.2.0
 Flask_Cors==3.0.10
 fp==0.2
 free_proxy==1.0.5
