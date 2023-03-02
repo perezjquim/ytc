@@ -60,7 +60,7 @@ class APIHandler( ):
 			print( '< Cutting' )		
 
 			print( '> Preparing request' )	
-			succ_response = send_from_directory( video_tmp_directory, filename = video_ffmpeg_filename, as_attachment = True  )
+			succ_response = send_from_directory( video_tmp_directory, path = video_ffmpeg_filename, as_attachment = True  )
 			succ_response.headers[ 'Content-Disposition' ] = "attachment; filename={};".format( video_output_filename )
 			succ_response.headers[ 'Access-Control-Expose-Headers' ] = 'Content-Disposition'
 			print( '< Preparing request' )		
