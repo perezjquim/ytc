@@ -37,7 +37,7 @@ class APIHandler( ):
 			if os.path.exists( '{}/{}'.format( video_tmp_directory, video_ydl_filename ) ):
 				print( '< Downloading.. done (already downloaded)!' )
 			else:
-				ydl_opts = { "format_sort": "best.2", "outtmpl": video_ydl_filename }
+				ydl_opts = { "outtmpl": video_ydl_filename }
 				with YoutubeDL( ydl_opts ) as ydl:
 						ydl.download( [ args[ 'url' ] ] )			
 				print( '< Downloading.. done!' )			
