@@ -31,18 +31,18 @@ class APIHandler( ):
 			video_tmp_directory = './'	
 
 			url_encoded = quote( args[ 'url' ], safe = '' 	)
-			video_ydl_filename = 'tmp-ydl - {}.webm'.format( url_encoded )	
+			video_ydl_filename = 'tmp-ydl - {}.mp4'.format( url_encoded )	
 
 			print( '> Downloading' )
 			if os.path.exists( '{}/{}'.format( video_tmp_directory, video_ydl_filename ) ):
 				print( '< Downloading.. done (already downloaded)!' )
 			else:
-				ydl_opts = { "format": "best[ext=webm]", "outtmpl": video_ydl_filename }
+				ydl_opts = { "format": "best[ext=mp4]", "outtmpl": video_ydl_filename }
 				with YoutubeDL( ydl_opts ) as ydl:
 						ydl.download( [ args[ 'url' ] ] )			
 				print( '< Downloading.. done!' )			
 
-			video_output_filename = 'YTC - {}.webm'.format( current_datetime_str )	
+			video_output_filename = 'YTC - {}.mp4'.format( current_datetime_str )	
 			video_ffmpeg_filename = 'tmp-ff - {}'.format( video_output_filename )		
 
 			start_datetime = datetime.strptime( args[ 'start_time' ], "%M:%S" )
