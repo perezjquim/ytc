@@ -3,5 +3,5 @@ flask_cors==4.0.0
 fp==0.2
 gunicorn==21.2.0
 moviepy==1.0.3
-yt_dlp==2023.12.30
+yt_dlp==2024.7.9
 free_proxy==1.1.1
