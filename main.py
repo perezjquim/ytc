@@ -1,7 +1,7 @@
 import gunicorn #dummy
 from flask import Flask
 from flask_cors import CORS
-from handlers.APIHandler import APIHandler
+from handlers.APIHandler_YoutubeSlicer import APIHandler
 
 api_handler = APIHandler( )
 

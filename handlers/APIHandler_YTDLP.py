@@ -11,6 +11,19 @@ import threading
 
 api = Blueprint( "APIHandler", __name__ )
 
+COOKIE_FILE_NAME = 'YT-WEB-COOKIES.txt'
+
+PO_TOKEN = 'MpQB4OxBGZ4PWPzg1EZoUgb2QzOmQbScKmdRC4uFI7la9iZQPbQp2HSGGTNUVySsgjWXOT7Kz8IISw-Ic1BJd-0uX3Nce__4VLNoYE87PQltWdtjb3Dt_ceHgb73aFVJCNYvyLdcOpv4BUzy5yEWHC3kaPw8A0tDYObAiuBFil4NZH7bcWb__XuYTUGIj3YF7NzWIkwRzg=='
+
+EXTRACTOR_ARGS = {
+	'youtube': {
+		'player_client' : ['web', 'default'],
+		'player_skip': ['webpage', 'configs'],
+		'po_token' : ['web' + '+' + PO_TOKEN],
+		'visitor_data': '5suL7ajvPdU'
+	} 
+}
+
 class APIHandler( ):
 
 	__proxies_lock = None
@@ -37,7 +50,11 @@ class APIHandler( ):
 			if os.path.exists( '{}/{}'.format( video_tmp_directory, video_ydl_filename ) ):
 				print( '< Downloading.. done (already downloaded)!' )
 			else:
-				ydl_opts = { "format": "best[ext=mp4]", "outtmpl": video_ydl_filename }
+				ydl_opts = { 
+					"format": "best[ext=mp4]",
+					"outtmpl": video_ydl_filename,
+					"extractor_args": EXTRACTOR_ARGS
+				}
 				with YoutubeDL( ydl_opts ) as ydl:
 						ydl.download( [ args[ 'url' ] ] )			
 				print( '< Downloading.. done!' )			
@@ -79,7 +96,14 @@ class APIHandler( ):
 			
 			args = request.args
 
-			with YoutubeDL({}) as ydl:
+			ydl_opts = {
+				"extractor_args": EXTRACTOR_ARGS,
+				"cookiefile": COOKIE_FILE_NAME
+			}
+
+			print(ydl_opts)
+
+			with YoutubeDL(ydl_opts) as ydl:
 					video_info = ydl.extract_info( args[ 'url' ], download = False )
 					title = video_info.get( 'title' )
 					thumbnail_url = video_info.get( 'thumbnails' )[ 0 ][ 'url' ]
