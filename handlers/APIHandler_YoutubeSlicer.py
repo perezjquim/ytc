@@ -9,12 +9,24 @@ import requests
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
 
+import m3u8_To_MP4
+
 api = Blueprint( "APIHandler", __name__ )
 
 class APIHandler( ):
 
 	def get_blueprint( self ):
 		return api	
+
+	@api.route( '/test', methods = [ 'GET' ] )	
+	def test( ):		
+		try:
+
+			m3u8_To_MP4.multithread_download('https://streaming-vod.rtp.pt/hls/nas2.share/h264/512x384/p8687/p8687_1_202103245764.mp4/master.m3u8');					
+
+		except Exception as e:
+
+			return Response( str( e ), status = 500 )			
 
 	@api.route( '/crop-video', methods = [ 'GET' ] )
 	def crop_video( ):
