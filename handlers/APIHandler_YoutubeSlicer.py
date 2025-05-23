@@ -22,7 +22,7 @@ class APIHandler( ):
 	def test( ):		
 		try:
 
-			m3u8_To_MP4.multithread_download('https://streaming-vod.rtp.pt/hls/nas2.share/h264/512x384/p8687/p8687_1_202103245764.mp4/master.m3u8');					
+			m3u8_To_MP4.multithread_download('https://streaming-vod.rtp.pt/drm-dash/nas2.share,/h264/512x384/p14532/p14532_1_20250523161005e016t1122d_lo.mp4,/h264/512x384/p14532/p14532_1_20250523161005e016t1122d.mp4,.urlset/manifest.mpd');					
 
 		except Exception as e:
 
