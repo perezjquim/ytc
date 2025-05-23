@@ -10,6 +10,7 @@ from urllib.parse import urlparse
 from urllib.parse import parse_qs
 
 import m3u8_To_MP4
+from DDownloader.modules.downloader import DOWNLOADER
 
 api = Blueprint( "APIHandler", __name__ )
 
@@ -22,7 +23,12 @@ class APIHandler( ):
 	def test( ):		
 		try:
 
-			m3u8_To_MP4.multithread_download('https://streaming-vod.rtp.pt/drm-dash/nas2.share,/h264/512x384/p14532/p14532_1_20250523161005e016t1122d_lo.mp4,/h264/512x384/p14532/p14532_1_20250523161005e016t1122d.mp4,.urlset/manifest.mpd');					
+			downloader = DOWNLOADER()
+			downloader.manifest_url = "'https://streaming-vod.rtp.pt/drm-dash/nas2.share,/h264/512x384/p14532/p14532_1_20250523161005e016t1122d_lo.mp4,/h264/512x384/p14532/p14532_1_20250523161005e016t1122d.mp4,.urlset/manifest.mpd"
+			downloader.output_name = "output.mp4"  # Desired output file name
+			downloader.download()  # Start the downloading and decryption process
+
+			#m3u8_To_MP4.multithread_download('https://streaming-vod.rtp.pt/drm-dash/nas2.share,/h264/512x384/p14532/p14532_1_20250523161005e016t1122d_lo.mp4,/h264/512x384/p14532/p14532_1_20250523161005e016t1122d.mp4,.urlset/manifest.mpd');					
 
 		except Exception as e:
 
