@@ -2,6 +2,6 @@ Flask
 flask_cors
 fp
 gunicorn
-moviepy
+moviepy==1.0.3
 yt_dlp
 free_proxy
