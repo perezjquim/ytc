@@ -94,7 +94,9 @@ class APIHandler( ):
 							print( e )
 
 				if trying_with_fallback == True and fallback_worked == False:
-					return Response( 'Not working at the moment, please try again later!', status = 500 )							
+					fallback_failed_msg = 'Not working at the moment, please try again later!'
+					print( fallback_failed_msg )
+					return Response( fallback_failed_msg, status = 500 )							
 
 				print( '< Downloading.. done!' )			
 
