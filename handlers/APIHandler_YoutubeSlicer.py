@@ -8,9 +8,9 @@ import threading
 import requests
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
+from fp.fp import FreeProxy
 
-import m3u8_To_MP4
-from DDownloader.modules.downloader import DOWNLOADER
+from yt_dlp import YoutubeDL
 
 api = Blueprint( "APIHandler", __name__ )
 
@@ -18,21 +18,6 @@ class APIHandler( ):
 
 	def get_blueprint( self ):
 		return api	
-
-	@api.route( '/test', methods = [ 'GET' ] )	
-	def test( ):		
-		try:
-
-			downloader = DOWNLOADER()
-			downloader.manifest_url = "'https://streaming-vod.rtp.pt/drm-dash/nas2.share,/h264/512x384/p14532/p14532_1_20250523161005e016t1122d_lo.mp4,/h264/512x384/p14532/p14532_1_20250523161005e016t1122d.mp4,.urlset/manifest.mpd"
-			downloader.output_name = "output.mp4"  # Desired output file name
-			downloader.download()  # Start the downloading and decryption process
-
-			#m3u8_To_MP4.multithread_download('https://streaming-vod.rtp.pt/drm-dash/nas2.share,/h264/512x384/p14532/p14532_1_20250523161005e016t1122d_lo.mp4,/h264/512x384/p14532/p14532_1_20250523161005e016t1122d.mp4,.urlset/manifest.mpd');					
-
-		except Exception as e:
-
-			return Response( str( e ), status = 500 )			
 
 	@api.route( '/crop-video', methods = [ 'GET' ] )
 	def crop_video( ):
@@ -52,23 +37,60 @@ class APIHandler( ):
 			if os.path.exists( '{}/{}'.format( video_tmp_directory, video_yt_filename ) ):
 				print( '< Downloading.. done (already downloaded)!' )
 			else:
-				api_url = "https://youtubeslicer.com/download_video"
+				try:
 
-				parsed_url = urlparse( args['url'] )
-				video_id = parse_qs( parsed_url.query )['v'][0]
+					api_url = "https://youtubeslicer.com/download_video"
 
-				api_params = {
-                    'filename': current_datetime_str,
-                    'media_type': 'video',
-                    'video_id': video_id
-                }
+					parsed_url = urlparse( args['url'] )
+					video_id = parse_qs( parsed_url.query )['v'][0]
 
-				api_response = requests.post( url = api_url, json = api_params )
+					api_params = {
+						'filename': current_datetime_str,
+						'media_type': 'video',
+						'video_id': video_id
+					}
 
-				api_response.raise_for_status( )
+					api_response = requests.post( url = api_url, json = api_params )
 
-				with open( video_yt_filename, "wb" ) as file:
-				    file.write(api_response.content)
+					api_response.raise_for_status( )
+
+					with open( video_yt_filename, "wb" ) as file:
+						file.write(api_response.content)					
+
+				except:	
+
+					trying_with_fallback = True
+					fallback_worked = False
+
+					print( 'Trying with fallback method (direct YT-DLP call)...' )
+
+					for i in range(5):
+
+						use_random_proxy = ( i > 0 )
+
+						try:
+
+							proxy = FreeProxy( rand = use_random_proxy, https=True, url="www.youtube.com" ).get( )
+							print( 'Proxy:' )
+							print( proxy )
+
+							ydl_opts = { 
+								"format": "best[ext=mp4]",
+                                "outtmpl": os.path.join(video_tmp_directory, video_yt_filename),
+								"proxy": proxy,
+								"extractor_retries": 1
+							}						
+							with YoutubeDL( ydl_opts ) as ydl:
+								ydl.download( [ args[ 'url' ] ] )
+								fallback_worked = True
+								print( 'Successfully downloaded through proxy!' )
+								break
+
+						except Exception as e:
+							print( e )
+
+				if trying_with_fallback == True and fallback_worked == False:
+					return Response( 'Not working at the moment, please try again later!', status = 500 )							
 
 				print( '< Downloading.. done!' )			
 

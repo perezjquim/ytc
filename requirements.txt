@@ -1,9 +1,7 @@
-Flask==3.0.2
-flask_cors==4.0.0
-fp==0.2
-gunicorn==21.2.0
-moviepy==1.0.3
-#yt_dlp==2024.11.6.232826.dev0
-free_proxy==1.1.1
-m3u8-To-MP4==0.1.11
-DDownloader==0.4.1
+Flask
+flask_cors
+fp
+gunicorn
+moviepy
+yt_dlp
+free_proxy
