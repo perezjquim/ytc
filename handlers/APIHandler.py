@@ -37,6 +37,10 @@ class APIHandler( ):
 			if os.path.exists( '{}/{}'.format( video_tmp_directory, video_yt_filename ) ):
 				print( '< Downloading.. done (already downloaded)!' )
 			else:
+
+				trying_with_fallback = False
+				fallback_worked = False
+
 				try:
 
 					api_url = "https://youtubeslicer.com/download_video"
